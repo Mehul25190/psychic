@@ -35,6 +35,11 @@ export default {
     icon:'settings',
     label: Strings.messages,
   },
+  Call : {
+    route: 'Call',
+    icon:'settings',
+    label: Strings.call,
+  },
   Chat : {
     route: 'Chat',
     icon:'settings',
@@ -45,7 +50,11 @@ export default {
     icon:'settings',
     label: Strings.settings,
   },
-
+  Package: {
+    route: 'Package',
+    icon:'settings',
+    label: Strings.call,
+  },
   SignOutStack : {
     route: 'SignOutStack'
   }, 

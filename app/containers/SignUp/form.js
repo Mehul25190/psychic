@@ -4,7 +4,7 @@ import { Field, reduxForm } from 'redux-form';
 import { View } from "react-native";
 import { connect } from "react-redux";
 import { Form, Item, Input, Title, Button, Text } from 'native-base';
-import { required, email, length, confirmation } from 'redux-form-validators'
+import { required, email, length, confirmation, numericality } from 'redux-form-validators'
 import { InputBox } from '../../components';
 import styles from './styles';
 
@@ -35,6 +35,15 @@ class SignUpForm extends React.Component {
           validate={[required({msg: `${language.email} ${language.required}`}), email({msg: `${language.email} ${language.notValid}`})]}
         />
         <Field 
+          name="mobile" 
+          component={InputBox} 
+          placeholder="Phone"
+          keyboardType={'numeric'}
+          icon='phone'
+          iconStyle={{top:5,paddingLeft:15}}
+          validate={[required({msg: `${language.phone} ${language.required}`}),length({ minimum: 10,msg: `${language.tooShort}`})]}
+        />
+        <Field 
           name="password" 
           component={InputBox} 
           placeholder={language.password}
@@ -44,7 +53,7 @@ class SignUpForm extends React.Component {
           validate={[required({msg: `${language.password} ${language.required}`}),length({ minimum: 4,msg: `${language.tooShort}` })]}
         />
         <Field 
-          name="confirmpass" 
+          name="c_password" 
           component={InputBox} 
           placeholder={language.confirmPassword}
           secureTextEntry={true}

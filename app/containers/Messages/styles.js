@@ -200,7 +200,7 @@ from'../../constants/';
     fontSize: 15, color: Colors.red,
   },
   listitem: {
-    paddingLeft: 15, marginLeft: 0,
+    paddingLeft: 15, marginLeft: 0, paddingBottom: 15,
   },
   viewpropertylistitem: {
     paddingLeft: 15, marginLeft: 0, backgroundColor: '#40B79330',
@@ -373,6 +373,16 @@ from'../../constants/';
       height: 16,
       borderRadius: 16/2,
       backgroundColor: 'green',
+      position: 'absolute', borderWidth:2, borderColor:'#ffffff',
+      right: 0,
+      bottom: 0,
+    },
+
+    symbolred: {
+      width: 16,
+      height: 16,
+      borderRadius: 16/2,
+      backgroundColor: 'red',
       position: 'absolute', borderWidth:2, borderColor:'#ffffff',
       right: 0,
       bottom: 0,

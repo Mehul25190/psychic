@@ -2,7 +2,8 @@ import React from 'react'
 import { Text, Animated, Easing } from 'react-native'
 import { createStackNavigator, createDrawerNavigator } from 'react-navigation'
 
-import { SignIn, SignUp, Forgotpassword, Home, Drawer, Newsfeed, NewsDetail, Horoscope, Messages, Settings, Chat } from "../containers";
+import { SignIn, SignUp, Forgotpassword, Home, Drawer, Newsfeed, NewsDetail, Horoscope, Messages, Settings, Chat, Call, Package } from "../containers";
+// import { Call } from '../containers/Messages';
 import { Colors, Screens } from "../constants";
 
 const transitionConfig = () => ({
@@ -55,8 +56,14 @@ const DrawerStack = createDrawerNavigator({
   [Screens.Chat.route]: { 
     screen: Chat 
   },
+  [Screens.Call.route]: { 
+    screen: Call 
+  },
   [Screens.Settings.route]: { 
     screen: Settings 
+  },
+  [Screens.Package.route]: { 
+    screen: Package 
   },
 }, {
   gesturesEnabled: true,
@@ -100,6 +107,7 @@ const PrimaryNav = createStackNavigator({
   [Screens.NewsDetail.route]: { screen: NewsDetail },
   [Screens.Horoscope.route]: { screen: Horoscope },
   [Screens.Messages.route]: { screen: Messages },
+  [Screens.Call.route]: { screen: Call },
   [Screens.Chat.route]: { screen: Chat },
   [Screens.SignInStack.route]: { screen: DrawerNavigation }
 }, {

@@ -13,7 +13,7 @@ export default {
 
  
   contentsection: {fontSize:22, padding: Layout.indent,},
-  pagetitle: {fontSize:20, padding: Layout.indent, paddingBottom:0, color:Colors.commoncolor, },
+  pagetitle: {fontSize:18, padding: Layout.indent, paddingBottom:Layout.indent, color:Colors.primary, textAlign:'center' },
   boxcontentarea: {backgroundColor:Colors.white, marginRight: Layout.indent, width:170, minHeight:140, borderWidth:1, borderColor:'#ededed'},
   boxcontentareagrid: {backgroundColor:Colors.white, marginRight: Layout.indent, marginBottom: Layout.indent, width:170, minHeight:140, borderWidth:1, borderColor:'#ededed'},
   contentspacingtext:{ padding: Layout.indent, paddingTop:5,},
@@ -40,15 +40,6 @@ export default {
       height: 14,
       borderRadius: 14/2,
       backgroundColor: 'green',
-      position: 'absolute', borderWidth:2, borderColor:'#ffffff',
-      left: 10,
-      top: 10,
-    },
-    symbolred: {
-      width: 14,
-      height: 14,
-      borderRadius: 14/2,
-      backgroundColor: 'red',
       position: 'absolute', borderWidth:2, borderColor:'#ffffff',
       left: 10,
       top: 10,

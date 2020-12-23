@@ -3,6 +3,7 @@ export const initialState = {
 	common:{
 		isLoading: false,
 		showModal: false,
+		onlineStatus: false,
 	},
 	auth:{
 		user: null,

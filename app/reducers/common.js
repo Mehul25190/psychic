@@ -17,6 +17,12 @@ const common = (state = initialState.common, action) => {
         showModal: action.showModal,
       }
     }
+    case ActionTypes.ONLINE_STATUS: {
+      return {
+        ...state,
+        onlineStatus: action.onlineStatus,
+      }
+    }
 
     // Default
     default: {

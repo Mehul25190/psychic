@@ -1,6 +1,6 @@
-  import React from 'react'
-import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, FlatList} from 'react-native'
-import _ from 'lodash'; 
+import React from 'react'
+import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, FlatList } from 'react-native'
+import _ from 'lodash';
 import { Layout, Colors, Screens, ActionTypes } from '../../constants';
 import { Logo, Statusbar, Headers, Svgicon, LoginBackIcon, FooterIcon, ModalBox, InputBoxWithoutIcon } from '../../components';
 import imgs from '../../assets/images';
@@ -9,8 +9,8 @@ import {
   Content,
   Icon,
   Spinner,
-  Button,Switch,
-  Text, Row, Col, Item, Input,List, ListItem, Form,
+  Button, Switch,
+  Text, Row, Col, Item, Input, List, ListItem, Form,
   Header, Left, Body, Title, Right, Footer, FooterTab, Thumbnail,
 } from 'native-base';
 import { connect, Field } from "react-redux";
@@ -18,6 +18,7 @@ import * as userActions from "../../actions/user";
 import appStyles from '../../theme/appStyles';
 import styles from './styles';
 import { SearchBar } from 'react-native-elements';
+import SocketContext from '../Context/socket-context';
 
 
 class Settings extends React.Component {
@@ -25,36 +26,36 @@ class Settings extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state={
-      visibleModal:false
+    this.state = {
+      visibleModal: false
     }
   }
 
-  logout(){
+  logout() {
     this.props.logout();
     this.props.navigation.navigate(Screens.SignOutStack.route);
   }
-  
-  render(){
+
+  render() {
 
     const { search } = this.state;
     return (
       <Container>
 
-            <Header transparent style={appStyles.headerbg}>
+        <Header transparent style={appStyles.headerbg}>
           <Left style={appStyles.row}>
-            <LoginBackIcon props={this.props} /> 
+            <LoginBackIcon props={this.props} />
           </Left>
           <Body style={appStyles.rowXcenter}>
             <Title style={appStyles.titlewidth}>Settings</Title>
           </Body>
-          <Right/>
+          <Right />
         </Header>
         <Content enableOnAndroid bounces={false}>
-        <ListItem icon>
+          <ListItem icon>
             <Left>
               <Button style={{ backgroundColor: "#007AFF" }}>
-                <Icon type='MaterialCommunityIcons' style={styles.iconSend} name='information-variant' /> 
+                <Icon type='MaterialCommunityIcons' style={styles.iconSend} name='information-variant' />
               </Button>
             </Left>
             <Body>
@@ -64,10 +65,10 @@ class Settings extends React.Component {
               <Icon active name="arrow-forward" />
             </Right>
           </ListItem>
-          <ListItem icon>
+          <ListItem icon onPress={() => this.props.navigation.navigate(Screens.Package.route)}>
             <Left>
               <Button style={{ backgroundColor: "#007AFF" }}>
-                <Icon type='MaterialIcons' style={styles.iconSend} name='attach-money' /> 
+                <Icon type='MaterialIcons' style={styles.iconSend} name='attach-money' />
               </Button>
             </Left>
             <Body>
@@ -80,7 +81,7 @@ class Settings extends React.Component {
           <ListItem icon>
             <Left>
               <Button style={{ backgroundColor: "#007AFF" }}>
-                <Icon type='Entypo' style={styles.iconSend} name='email' /> 
+                <Icon type='Entypo' style={styles.iconSend} name='email' />
               </Button>
             </Left>
             <Body>
@@ -94,7 +95,7 @@ class Settings extends React.Component {
           <ListItem icon>
             <Left>
               <Button style={{ backgroundColor: "#007AFF" }}>
-                <Icon type='FontAwesome' style={styles.iconSend} name='support' /> 
+                <Icon type='FontAwesome' style={styles.iconSend} name='support' />
               </Button>
             </Left>
             <Body>
@@ -107,7 +108,7 @@ class Settings extends React.Component {
           <ListItem icon>
             <Left>
               <Button style={{ backgroundColor: "#007AFF" }}>
-                <Icon type='AntDesign' style={styles.iconSend} name='notification' /> 
+                <Icon type='AntDesign' style={styles.iconSend} name='notification' />
               </Button>
             </Left>
             <Body>
@@ -117,10 +118,13 @@ class Settings extends React.Component {
               <Icon active name="arrow-forward" />
             </Right>
           </ListItem>
-          <ListItem icon  onPress={() => this.logout()}>
+          <ListItem icon onPress={() => {
+            this.props.socket.emit('logout', this.props.user)
+            this.logout()
+          }}>
             <Left>
               <Button style={{ backgroundColor: "#d90746" }}>
-                <Icon type='AntDesign' style={styles.iconSend} name='logout' /> 
+                <Icon type='AntDesign' style={styles.iconSend} name='logout' />
               </Button>
             </Left>
             <Body>
@@ -130,15 +134,15 @@ class Settings extends React.Component {
               <Icon active name="arrow-forward" />
             </Right>
           </ListItem>
-          
-           
+
+
         </Content>
         <Footer style={appStyles.customfooterBg}>
           <FooterIcon />
         </Footer>
-        
+
       </Container>
-     
+
     );
   }
 }
@@ -150,9 +154,15 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-      logout: () => dispatch(userActions.logoutUser()),
-   };
+    logout: () => dispatch(userActions.logoutUser()),
+  };
 };
 
+const ConnectWithSocket = props => (
+  <SocketContext.Consumer>
+    {value => <Settings {...props} socket={value.socket} notificationRef={value.notificationRef} />}
+  </SocketContext.Consumer>
+)
+
 // Exports
-export default connect(mapStateToProps, mapDispatchToProps)(Settings);
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectWithSocket);

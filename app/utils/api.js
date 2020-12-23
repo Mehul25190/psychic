@@ -21,7 +21,7 @@ const execute = async (path, method = 'GET', { params = {} , queries = {}, paylo
   const base = apiConfig.apiBaseUrl.replace(/~\/$/, '');
   const url = compiler(params || {});
 
-  if (token) {
+  if (path != '/login' || path != '/register') {
     headers['Authorization'] = `Bearer ${ token }`;
   }
 

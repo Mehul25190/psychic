@@ -26,6 +26,7 @@ import {showToast} from '../../utils/common';
 import appStyles from '../../theme/appStyles';
 import styles from './styles';
 import SignUpForm from './form';
+import Storage from '../../utils/storage';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -41,12 +42,12 @@ class SignUp extends React.Component {
   signup(values, dispatch, props){
     dispatch(userActions.signup(values))
       .then(res => {
-        if(res.status == 200){
-          showToast(res.msg,"success");
+        if(res.status == 'success'){
+          showToast(res.message,"success");
           dispatch(NavigationActions.navigate({ routeName: Screens.SignIn.route }));
           // this.props.navigation.navigate(Screens.SignIn.route)
         }else{
-          showToast(res.msg,"danger");
+          showToast(res.message,"danger");
         }
       })
       .catch(error => {

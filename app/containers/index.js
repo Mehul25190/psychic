@@ -9,5 +9,7 @@ import Horoscope from "./Horoscope";
 import Messages from "./Messages";
 import Chat from "./Messages/chat.js";
 import Settings from "./Settings";
+import Call from "./Messages/call";
+import Package from './Package/index.js';
 
-export { SignIn, SignUp, Forgotpassword, Drawer, Home, Newsfeed, NewsDetail, Horoscope, Messages, Settings, Chat };
+export { SignIn, SignUp, Forgotpassword, Drawer, Home, Newsfeed, NewsDetail, Horoscope, Messages, Settings, Chat, Call, Package };
