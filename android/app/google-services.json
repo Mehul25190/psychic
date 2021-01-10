@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "579455204356",
+    "firebase_url": "https://wixnet-2ceac.firebaseio.com",
+    "project_id": "wixnet-2ceac",
+    "storage_bucket": "wixnet-2ceac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:579455204356:android:ecf1fd4b15b8d47bb5c951",
+        "android_client_info": {
+          "package_name": "com.psychic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "579455204356-u4pl8qgqdkl5l1bd59ktmr5j3pt98d6u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOWi1iRG5ZjWPfX1t9POzy-qqIVt8jDro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "579455204356-u4pl8qgqdkl5l1bd59ktmr5j3pt98d6u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

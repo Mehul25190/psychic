@@ -24,11 +24,14 @@
       "app/assets/*"
     ],
     "android": {
-      "package": "com.universal.wixnet"
+      "package": "com.wixnet"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.universal.wixnet"
-    }
-  }
+      "bundleIdentifier": "com.wixnet"
+    },
+    "entryPoint": "node_modules/expo/AppEntry.js"
+  },
+  "displayName": "Wixnet",
+  "name": "psychic"
 }
