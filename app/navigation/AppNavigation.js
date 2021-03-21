@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, Animated, Easing } from 'react-native'
 import { createStackNavigator, createDrawerNavigator } from 'react-navigation'
 
-import { SignIn, SignUp, Forgotpassword, Home, Drawer, Newsfeed, NewsDetail, Horoscope, Messages, Settings, Chat, Call, Package } from "../containers";
+import { SignIn, SignUp, Forgotpassword, Home, Drawer, Newsfeed, NewsDetail, Horoscope, Messages, Settings, Chat, Call, Package, PersonalInfo, Supports, TermsService } from "../containers";
 // import { Call } from '../containers/Messages';
 import { Colors, Screens } from "../constants";
 
@@ -63,7 +63,16 @@ const DrawerStack = createDrawerNavigator({
     screen: Settings 
   },
   [Screens.Package.route]: { 
-    screen: Package 
+    screen: Package
+  },
+  [Screens.PersonalInfo.route]: { 
+    screen: PersonalInfo 
+  },
+  [Screens.Supports.route]: { 
+    screen: Supports 
+  },
+  [Screens.TermsService.route]: { 
+    screen: TermsService 
   },
 }, {
   gesturesEnabled: true,
@@ -109,6 +118,9 @@ const PrimaryNav = createStackNavigator({
   [Screens.Messages.route]: { screen: Messages },
   [Screens.Call.route]: { screen: Call },
   [Screens.Chat.route]: { screen: Chat },
+  [Screens.PersonalInfo.route]: { screen: PersonalInfo },
+  [Screens.Supports.route]: { screen: Supports },
+  [Screens.TermsService.route]: { screen: TermsService },
   [Screens.SignInStack.route]: { screen: DrawerNavigation }
 }, {
   headerMode: 'none',

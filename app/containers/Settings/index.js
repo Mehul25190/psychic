@@ -52,7 +52,7 @@ class Settings extends React.Component {
           <Right />
         </Header>
         <Content enableOnAndroid bounces={false}>
-          <ListItem icon>
+          <ListItem icon onPress={() => this.props.navigation.navigate(Screens.PersonalInfo.route)}>
             <Left>
               <Button style={{ backgroundColor: "#007AFF" }}>
                 <Icon type='MaterialCommunityIcons' style={styles.iconSend} name='information-variant' />
@@ -78,21 +78,7 @@ class Settings extends React.Component {
               <Icon active name="arrow-forward" />
             </Right>
           </ListItem>
-          <ListItem icon>
-            <Left>
-              <Button style={{ backgroundColor: "#007AFF" }}>
-                <Icon type='Entypo' style={styles.iconSend} name='email' />
-              </Button>
-            </Left>
-            <Body>
-              <Text>Response Email Notifications</Text>
-            </Body>
-            <Right>
-              <Text>On</Text>
-              <Icon active name="arrow-forward" />
-            </Right>
-          </ListItem>
-          <ListItem icon>
+          <ListItem icon onPress={() => this.props.navigation.navigate(Screens.Supports.route)}>
             <Left>
               <Button style={{ backgroundColor: "#007AFF" }}>
                 <Icon type='FontAwesome' style={styles.iconSend} name='support' />
@@ -105,7 +91,7 @@ class Settings extends React.Component {
               <Icon active name="arrow-forward" />
             </Right>
           </ListItem>
-          <ListItem icon>
+          <ListItem icon onPress={() => this.props.navigation.navigate(Screens.TermsService.route)}>
             <Left>
               <Button style={{ backgroundColor: "#007AFF" }}>
                 <Icon type='AntDesign' style={styles.iconSend} name='notification' />

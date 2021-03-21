@@ -11,5 +11,8 @@ import Chat from "./Messages/chat.js";
 import Settings from "./Settings";
 import Call from "./Messages/call";
 import Package from './Package/index.js';
+import PersonalInfo from './Settings/personalinfo.js';
+import Supports from './Settings/support.js';
+import TermsService from './Settings/termservice.js';
 
-export { SignIn, SignUp, Forgotpassword, Drawer, Home, Newsfeed, NewsDetail, Horoscope, Messages, Settings, Chat, Call, Package };
+export { SignIn, SignUp, Forgotpassword, Drawer, Home, Newsfeed, NewsDetail, Horoscope, Messages, Settings, Chat, Call, Package, PersonalInfo, Supports, TermsService };

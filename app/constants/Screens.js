@@ -50,8 +50,23 @@ export default {
     icon:'settings',
     label: Strings.settings,
   },
+  TermsService : {
+    route: 'TermsService',
+    icon:'settings',
+    label: Strings.settings,
+  },
   Package: {
     route: 'Package',
+    icon:'settings',
+    label: Strings.call,
+  },
+  Supports: {
+    route: 'Supports',
+    icon:'settings',
+    label: Strings.call,
+  },
+  PersonalInfo: {
+    route: 'PersonalInfo',
     icon:'settings',
     label: Strings.call,
   },
