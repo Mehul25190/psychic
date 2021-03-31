@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, Image, StatusBar, AppState, Alert } from 'react-native';
 import { PersistGate } from 'redux-persist/es/integration/react'
 import { Provider } from 'react-redux';
+import { Url } from './app/constants'
 
 import * as Font from 'expo-font';
 
@@ -40,7 +41,7 @@ function cacheFonts(fonts) {
   return fonts.map(font => Font.loadAsync(font));
 }
 
-socket = io('http://161.97.122.135:3000/webrtcPeer', {
+socket = io(Url.server+'/webrtcPeer', {
   path: '/webrtc',
   query: {}
 })
@@ -73,7 +74,7 @@ export default class App extends React.Component {
     // this.setState({ isReady: true });
   }
 
-  /* async componentDidMount() {
+  async componentDidMount() {
     // this.checkPermission()
     // this.createNotifcationListeners()
   }
@@ -132,7 +133,7 @@ export default class App extends React.Component {
       ],
       { cancelable: false }
     )
-  } */
+  }
 
   render() {
     return (
@@ -144,8 +145,8 @@ export default class App extends React.Component {
         <Provider store={store}>
           <StyleProvider style={getTheme(material)}>
             <Root>
-              {/* <StatusBar hidden /> */}
-              <Notification text={'Notification received'} ref={this.notificationRef} autohide={true} duration={5000} hideStatusBar />
+              <StatusBar hidden />
+              <Notification text={'New message received'} ref={this.notificationRef} autohide={true} duration={5000} hideStatusBar />
               <ReduxNavigation />
             </Root>
           </StyleProvider>

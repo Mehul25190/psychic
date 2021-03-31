@@ -148,11 +148,11 @@ class SignIn extends React.Component {
                     style={[styles.linkTextBtn, { justifyContent: 'flex-start' }]}>
                     <Text style={styles.linkText}> Register </Text>
                   </Button>
-                  <Button transparent full
+                  {/* <Button transparent full
                     onPress={() => this.onForgotpasswordPressHandler()}
                     style={[styles.linkTextBtn, { justifyContent: 'flex-end' }]}>
                     <Text style={styles.linkText}> Forgot your password? </Text>
-                  </Button>
+                  </Button> */}
                   {/* </Col> */}
                 </Row>
               </View>

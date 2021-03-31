@@ -33,11 +33,26 @@ class Home extends React.Component {
       users: MypropertiesData,
       category: [],
       psychic: [],
+      all: [],
     };
   }
 
-  updateStatus = (onlineUsers) => {
-    let users = this.state.psychic
+  shuffleArray = (array) => {
+    console.log('Shuffle : ', array)
+    let len = 0//array.length;
+    let temp;
+    while (len < 10) {
+      let index = Math.floor(Math.random() * len);
+      len++;
+      temp = array[len];
+      array[len] = array[index]
+      array[index] = temp
+    }
+    return array;
+  }
+
+  updateStatus = (array, onlineUsers, isAll) => {
+    let users = array
     users.forEach(element => {
       if (onlineUsers.has(element.id)) {
         element.status = 'Online'
@@ -47,9 +62,12 @@ class Home extends React.Component {
         element.socketId = null
       }
     });
-    this.setState({
-      psychic: users
-    })
+    isAll ? this.setState({
+      all: users
+    }) :
+      this.setState({
+        psychic: users
+      })
   }
 
   appState = () => {
@@ -70,25 +88,28 @@ class Home extends React.Component {
           this.props.psychicList(res.data[0].id)
             .then(r => {
               console.log('Psychic: ', r)
+              let temp = this.shuffleArray(r.all.data)
               this.setState({
-                psychic: r.data,
-                category: res.data
+                psychic: r.categoryWise.data,
+                category: res.data,
+                all: temp
               })
               this.props.socket.emit('broadcast')
             }).catch(e => console.error(e))
         }).catch(e => console.error(e))
 
       this.props.socket.on('broadcast', data => {
-        this.updateStatus(new Map(data))
+        this.updateStatus(this.state.psychic, new Map(data), false)
+        this.updateStatus(this.state.all, new Map(data), true)
       })
     }
 
-    this.props.socket.emit('notification')
-
-    // socket.on('notification', data => {
-    //   console.log(data)
-    //   this.props.notificationRef.current?.show();
-    // })
+    this.props.socket.on('notification', data => {
+      console.log('notification: ', data)
+      if (data.payload.fromUserId != this.props.user.id) {
+        this.props.notificationRef.current?.show()
+      }
+    })
 
     if (this.props.user && this.props.user.is_psychic) {
       this.props.navigation.navigate(Screens.Messages.route)
@@ -112,7 +133,7 @@ class Home extends React.Component {
 
   Call(socketId, liveRate) {
     const allowedMinutes = this.props.user.live_credits / liveRate;
-    if(allowedMinutes > 0) {
+    if (allowedMinutes > 0) {
       this.props.navigation.navigate(Screens.Call.route, { socketId: socketId, allowedMinutes: allowedMinutes, rate: liveRate })
     } else {
       showToast('You do not have sufficient credit to make call', 'danger')
@@ -139,6 +160,11 @@ class Home extends React.Component {
               </Col>
             </Row>
           </View>
+
+          <View>
+            <Text style={styles.pagetitle}>Featured</Text>
+          </View>
+
           <FlatList
             data={this.state.category}
             horizontal={true}
@@ -152,8 +178,10 @@ class Home extends React.Component {
                 // this.setState({ psychic: [] })
                 this.props.psychicList(item.id)
                   .then(res => {
+                    let temp = this.shuffleArray(res.all.data)
                     this.setState({
-                      psychic: res.data
+                      psychic: res.categoryWise.data,
+                      all: temp
                     })
                     this.props.socket.emit('broadcast')
                   }
@@ -166,110 +194,18 @@ class Home extends React.Component {
             }
             style={{ padding: 10 }}
           />
-          {/* <View>
-            <Text style={styles.pagetitle}>Psychics For You</Text>
-          </View>
-
-          <FlatList
-            data={MypropertiesData}
-            contentContainerStyle={styles.scrollViewStyle}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            automaticallyAdjustContentInsets={true}
-            removeClippedSubviews={true}
-            enableEmptySections={true}
-            showsHorizontalScrollIndicator={false}
-            style={styles.contentsection}
-            legacyImplementation={false}
-            keyExtractor={(item, index) => index}
-            renderItem={({ item, index }) =>
-              <TouchableOpacity onPress={() => this.ViewRoute()} style={styles.boxcontentarea}>
-                <View>
-                  <View style={styles.filtericon}>
-                    <Image source={require('../../assets/images/man.jpg')} style={styles.imagesection} />
-                  </View>
-                  <View style={styles.contentspacingtext}>
-                    <View style={styles.symbolgreen} />
-                    <Text style={styles.datetitle}>{item.name}</Text>
-                    <Text style={styles.positiontitle}>{item.position}</Text>
-                    <Text style={styles.pricetitle}>{item.price}</Text>
-                    <Row>
-                      <Col>
-                        <TouchableOpacity style={styles.livechat} onPress={() => this.Call()}>
-                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
-                        </TouchableOpacity>
-                      </Col>
-                      <Col>
-                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages()}>
-                          <Text style={styles.iconstitle}>TEXT</Text>
-                        </TouchableOpacity>
-                      </Col>
-
-                    </Row>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            }
-            keyExtractor={item => item.id}
-          />
-
-
-          <View>
-            <Text style={styles.pagetitle}>Live Psychics</Text>
-          </View>
-
-          <FlatList
-            data={this.state.users}
-            contentContainerStyle={styles.scrollViewStyle}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            automaticallyAdjustContentInsets={true}
-            removeClippedSubviews={true}
-            enableEmptySections={true}
-            showsHorizontalScrollIndicator={false}
-            style={styles.contentsection}
-            legacyImplementation={false}
-            keyExtractor={(item, index) => index}
-            renderItem={({ item, index }) =>
-              <TouchableOpacity onPress={() => this.ViewRoute()} style={styles.boxcontentarea}>
-                <View>
-                  <View style={styles.filtericon}>
-                    <Image source={require('../../assets/images/man.jpg')} style={styles.imagesection} />
-                  </View>
-                  <View style={styles.contentspacingtext}>
-                    <View style={[item.status == 'Online' ? styles.symbolgreen : styles.symbolred]} />
-                    <Text style={styles.datetitle}>{item.name}</Text>
-                    <Text style={styles.positiontitle}>{item.position}</Text>
-                    <Text style={styles.pricetitle}>{item.price}</Text>
-                    <Row>
-                      <Col>
-                        <TouchableOpacity style={styles.livechat} onPress={() => this.Call(item.socketId)}>
-                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
-                        </TouchableOpacity>
-                      </Col>
-                      <Col>
-                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name)}>
-                          <Text style={styles.iconstitle}>TEXT</Text>
-                        </TouchableOpacity>
-                      </Col>
-
-                    </Row>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            }
-            keyExtractor={item => item.id}
-          />
-
-          <View>
-            <Text style={styles.pagetitle}>Featured</Text>
-          </View> */}
-
-
 
 
           {this.props.isLoading ? <ActivityIndicator color={Colors.primary} size='large' /> : <FlatList
             data={this.state.psychic}
+            contentContainerStyle={styles.scrollViewStyle}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            automaticallyAdjustContentInsets={true}
+            removeClippedSubviews={true}
+            enableEmptySections={true}
+            showsHorizontalScrollIndicator={false}
+            legacyImplementation={false}
             style={styles.contentsection}
             renderItem={({ item }) =>
               <TouchableOpacity /* onPress={() => this.ViewRoute()} */ style={styles.boxcontentareagrid}>
@@ -285,7 +221,50 @@ class Home extends React.Component {
                     <Text style={styles.pricetitle}>{item.text_rate} Cr/Msg</Text>
                     <Row>
                       <Col>
-                        <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
+                        {/* <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
+                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
+                        </TouchableOpacity> */}
+                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate)}>
+                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
+                        </TouchableOpacity>
+                      </Col>
+                      <Col>
+                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate)}>
+                          <Text style={styles.iconstitle}>TEXT</Text>
+                        </TouchableOpacity>
+                      </Col>
+
+                    </Row>
+                  </View>
+                </View>
+              </TouchableOpacity>}
+          />}
+
+          <View>
+            <Text style={styles.pagetitle}>Psychics For You</Text>
+          </View>
+
+          {this.props.isLoading ? <ActivityIndicator color={Colors.primary} size='large' /> : <FlatList
+            data={this.state.all}
+            style={styles.contentsection}
+            renderItem={({ item }) =>
+              <TouchableOpacity /* onPress={() => this.ViewRoute()} */ style={styles.boxcontentareagrid}>
+                <View>
+                  <View style={styles.filtericon}>
+                    <Image source={{ uri: item.profile_img_path }} style={styles.imagesection} />
+                  </View>
+                  <View style={styles.contentspacingtext}>
+                    <View style={[item.status == 'Online' ? styles.symbolgreen : styles.symbolred]} />
+                    <Text style={styles.datetitle}>{item.name}</Text>
+                    {/* <Text style={styles.positiontitle}>{item.position}</Text> */}
+                    <Text style={styles.pricetitle}>{item.live_rate} Cr/Min</Text>
+                    <Text style={styles.pricetitle}>{item.text_rate} Cr/Msg</Text>
+                    <Row>
+                      <Col>
+                        {/* <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
+                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
+                        </TouchableOpacity> */}
+                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate)}>
                           <Text style={styles.iconstitle}>LIVE CHAT</Text>
                         </TouchableOpacity>
                       </Col>
@@ -301,7 +280,6 @@ class Home extends React.Component {
               </TouchableOpacity>}
             numColumns={2}
           />}
-
 
         </Content>
         <Footer style={appStyles.customfooterBg}>

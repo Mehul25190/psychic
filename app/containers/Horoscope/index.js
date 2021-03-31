@@ -19,6 +19,7 @@ import appStyles from '../../theme/appStyles';
 import styles from './styles';
 import { SearchBar } from 'react-native-elements';
 import { Yesterdayfeed, todayfeed, tomorrowfeed } from './Data.js';
+import SocketContext from '../Context/socket-context';
 
 class Horoscope extends React.Component {
 
@@ -34,20 +35,39 @@ class Horoscope extends React.Component {
 
   horoscopeValues = (data) => {
     let day = []
-    data.forEach(element => {
-      day.push({ title: 'Aquarius', content: element.aquarius })
-      day.push({ title: 'Aries', content: element.aries })
-      day.push({ title: 'Cancer', content: element.cancer })
-      day.push({ title: 'Capricorn', content: element.capricorn })
-      day.push({ title: 'Gemini', content: element.gemini })
-      day.push({ title: 'Leo', content: element.leo })
-      day.push({ title: 'Libra', content: element.libra })
-      day.push({ title: 'Pisces', content: element.pisces })
-      day.push({ title: 'Sagittarius', content: element.sagittarius })
-      day.push({ title: 'Scorpio', content: element.scorpio })
-      day.push({ title: 'Taurus', content: element.taurus })
-    });
+    if (data.length > 0) {
+      data.forEach(element => {
+        day.push({ title: 'Aquarius', content: element.aquarius })
+        day.push({ title: 'Aries', content: element.aries })
+        day.push({ title: 'Cancer', content: element.cancer })
+        day.push({ title: 'Capricorn', content: element.capricorn })
+        day.push({ title: 'Gemini', content: element.gemini })
+        day.push({ title: 'Leo', content: element.leo })
+        day.push({ title: 'Libra', content: element.libra })
+        day.push({ title: 'Pisces', content: element.pisces })
+        day.push({ title: 'Sagittarius', content: element.sagittarius })
+        day.push({ title: 'Scorpio', content: element.scorpio })
+        day.push({ title: 'Taurus', content: element.taurus })
+        day.push({ title: 'Virgo', content: element.virgo })
+      });
+    }
     return day
+  }
+
+  _renderHeader(item, expanded) {
+    return (
+      <View style={{
+        flexDirection: "row",justifyContent: "space-between",
+        alignItems: "center" ,
+        marginBottom: 1, backgroundColor: '#efefef', padding: 20, }}>
+      <Text style={{ fontWeight: "600" }}>
+          {" "}{item.title}
+        </Text>
+        {expanded
+          ? <Icon name="remove-circle" />
+          : <Icon name="add-circle" />}
+      </View>
+    );
   }
 
   componentDidMount() {
@@ -59,6 +79,13 @@ class Horoscope extends React.Component {
           tomorrow: this.horoscopeValues(res.data.tomorrow)
         })        
       }).catch(e => console.error(e))
+
+      this.props.socket.on('notification', data => {
+        console.log('notification: ', data)
+        if (data.payload.fromUserId != this.props.user.id) {
+          this.props.notificationRef.current?.show()
+        }
+      })
   }
 
   render() {
@@ -83,10 +110,11 @@ class Horoscope extends React.Component {
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
               <Accordion
                 dataArray={this.state.yesterday}
-                expanded={0}
+                expanded={[0]}
                 animation={true}
+                renderHeader={this._renderHeader}
                 activeTabStyle={{ color: '#ff0000' }}
-                headerStyle={{ marginBottom: 1, backgroundColor: '#efefef', padding: 20, }}
+                // headerStyle={{ marginBottom: 1, backgroundColor: '#efefef', padding: 20, }}
                 contentStyle={{ padding: 15, color: '#666666', fontSize: 16, lineHeight: 25, }}
               />
             </Tab>
@@ -95,9 +123,10 @@ class Horoscope extends React.Component {
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
               <Accordion
                 dataArray={this.state.today}
-                expanded={0}
+                expanded={[0]}
                 animation={true}
-                headerStyle={{ marginBottom: 1, backgroundColor: '#efefef', padding: 20, }}
+                renderHeader={this._renderHeader}
+                // headerStyle={{ marginBottom: 1, backgroundColor: '#efefef', padding: 20, }}
                 contentStyle={{ padding: 15, color: '#666666', fontSize: 16, lineHeight: 25, }}
               />
             </Tab>
@@ -106,9 +135,10 @@ class Horoscope extends React.Component {
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
               <Accordion
                 dataArray={this.state.tomorrow}
-                expanded={0}
+                expanded={[0]}
                 animation={true}
-                headerStyle={{ marginBottom: 1, backgroundColor: '#efefef', padding: 20, }}
+                renderHeader={this._renderHeader}
+                // headerStyle={{ marginBottom: 1, backgroundColor: '#efefef', padding: 20, }}
                 contentStyle={{ padding: 15, color: '#666666', fontSize: 16, lineHeight: 25, }}
               />
             </Tab>
@@ -137,5 +167,11 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
+const ConnectWithSocket = props => (
+  <SocketContext.Consumer>
+    {value => <Horoscope {...props} socket={value.socket} notificationRef={value.notificationRef} />}
+  </SocketContext.Consumer>
+)
+
 // Exports
-export default connect(mapStateToProps, mapDispatchToProps)(Horoscope);
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectWithSocket);

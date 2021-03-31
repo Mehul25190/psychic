@@ -20,6 +20,7 @@ import styles from './styles';
 import { SearchBar } from 'react-native-elements';
 import { NewsFeed } from './Data.js';
 import SocketContext from '../Context/socket-context';
+import moment from 'moment';
 
 class Messages extends React.Component {
 
@@ -36,7 +37,8 @@ class Messages extends React.Component {
     this.state = {
       visibleModal: false,
       data: [],
-      users: []
+      users: [],
+      fullData: []
     }
   }
 
@@ -52,9 +54,9 @@ class Messages extends React.Component {
 
   updateStatus = (onlineUsers) => {
     this.state.data.forEach(element => {
-      if (onlineUsers.has(element.userId)) {
+      if (onlineUsers.has(element.userId.userId)) {
         element.status = 'Online'
-        element.socketId = onlineUsers.get(element.userId).socketId
+        element.socketId = onlineUsers.get(element.userId.userId).socketId
       } else {
         element.status = 'Offline'
         element.socketId = null
@@ -86,7 +88,8 @@ class Messages extends React.Component {
         .then(res => {
           console.log('Chat list: ', res.data)
           this.setState({
-            data: res.data
+            data: res.data,
+            fullData: res.data
           })
           this.props.socket.emit('broadcast')
         })
@@ -97,18 +100,21 @@ class Messages extends React.Component {
         .then(res => {
           console.log('Chat list: ', res.data)
           this.setState({
-            data: res.data
+            data: res.data,
+            fullData: res.data
           })
         })
     })
   }
 
   renderMessages = (messages, userId) => {
+    console.log(messages)
+    console.log(userId)
     let time;
     let message;
-    for (let i = 0; i < messages.length; i++) {
-      if (messages[i].toUserId == userId) {
-        time = new Date(messages[i].time).toLocaleTimeString()
+    for (let i = messages.length-1; i >= 0; i--) {
+      if (messages[i].toUserId.userId == userId) {
+        time = moment(new Date(messages[i].time)).format('HH:mm').toString()
         message = messages[i].message
         break;
       }
@@ -117,6 +123,22 @@ class Messages extends React.Component {
       time: time,
       message: message
     }
+  }
+
+  handleSearch = text => {
+    const formattedQuery = text.toLowerCase()
+    const filteredData = _.filter(this.state.fullData, user => {
+      return this.contains(user, formattedQuery)
+    })
+    console.log(filteredData)
+    this.setState({ data: filteredData, query: text })
+  }
+
+  contains = ({ name }, query) => {
+    if (name.toLowerCase().includes(query)) {
+      return true
+    }
+    return false
   }
 
   render() {
@@ -141,7 +163,7 @@ class Messages extends React.Component {
               <TextInput
                 style={styles.input}
                 placeholder="Search Users"
-                onChangeText={(searchString) => { this.setState({ searchString }) }} />
+                onChangeText={this.handleSearch} />
             </View>
           </View>
 
@@ -149,17 +171,17 @@ class Messages extends React.Component {
             data={this.state.data}
             keyExtractor={(item, index) => index}
             renderItem={({ item, index }) => {
-              let m = this.props.user ? this.renderMessages(item.content[0].content, this.props.user.id) : null;
+              let m = this.props.user ? this.renderMessages(item.content, this.props.user.id) : null;
               return (
                 <ListItem avatar style={styles.listitem} >
-                  <TouchableOpacity style={appStyles.listitemtouch} onPress={() => this.Chat(item.userId, item.socketId, item.name)}>
+                  <TouchableOpacity style={appStyles.listitemtouch} onPress={() => this.Chat(item.userId.userId, item.socketId, item.userId.name)}>
 
                     <Left>
                       <Thumbnail source={require('../../assets/images/man.jpg')} style={{ width: 50, }} />
                       <View style={item.status == 'Online' ? styles.symbolgreen : styles.symbolred} />
                     </Left>
                     <Body>
-                      <Text>{item.name}</Text>
+                      <Text>{item.userId.name}</Text>
                       <Text note>{m ? m.message : ''}</Text>
                     </Body>
                     <Right>
@@ -204,7 +226,7 @@ const mapDispatchToProps = (dispatch) => {
 
 const ConnectWithSocket = props => (
   <SocketContext.Consumer>
-    {value => <Messages {...props} socket={value.socket} notificationRef={value.notificationRef} />}
+    {value => <Messages {...props} socket={value.socket} /* notificationRef={value.notificationRef} */ />}
   </SocketContext.Consumer>
 )
 

@@ -31,6 +31,15 @@ class Settings extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.props.socket.on('notification', data => {
+      console.log('notification: ', data)
+      if (data.payload.fromUserId != this.props.user.id) {
+        this.props.notificationRef.current?.show()
+      }
+    })
+  }
+
   logout() {
     this.props.logout();
     this.props.navigation.navigate(Screens.SignOutStack.route);

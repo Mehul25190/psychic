@@ -22,6 +22,7 @@ import { TextCredit, Subscription, LiveCredit } from './Data.js';
 import stripe from 'tipsi-stripe';
 import { showToast } from '../../utils/common';
 import { NavigationActions } from 'react-navigation';
+import SocketContext from '../Context/socket-context';
 
 class Package extends React.Component {
   constructor(props) {
@@ -47,6 +48,13 @@ class Package extends React.Component {
       }
       )
       .catch(e => console.error(e))
+
+    this.props.socket.on('notification', data => {
+      console.log('notification: ', data)
+      if (data.payload.fromUserId != this.props.user.id) {
+        this.props.notificationRef.current?.show()
+      }
+    })
   }
 
   getToken = (packageId, amount, description) => {
@@ -64,7 +72,7 @@ class Package extends React.Component {
             showToast('Payment successful.', 'success')
             this.props.navigation.navigate({ routeName: Screens.Home.route })
           } else {
-            showToast('Error occured. Please try after some time.', 'danger')
+            showToast('Error occured. Please try after sometime.', 'danger')
           }
         }).catch(e => {
           console.log('ERROR: ', e);
@@ -120,11 +128,11 @@ class Package extends React.Component {
                         <Left />
                         <Body>
                           <Text>{item.name}</Text>
-                          <Text note numberOfLines={1}>{item.desciption}</Text>
+                          <Text note numberOfLines={1}>{item.description}</Text>
                           <Text>AUD {item.amount}</Text>
                         </Body>
                         <Right>
-                          <Button rounded onPress={() => this.getToken(item.id, item.amount, item.desciption)}>
+                          <Button rounded onPress={() => this.getToken(item.id, item.amount, item.description)}>
                             <Text>Buy</Text>
                           </Button>
                         </Right>
@@ -251,5 +259,11 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
+const ConnectWithSocket = props => (
+  <SocketContext.Consumer>
+    {value => <Package {...props} socket={value.socket} notificationRef={value.notificationRef} />}
+  </SocketContext.Consumer>
+)
+
 // Exports
-export default connect(mapStateToProps, mapDispatchToProps)(Package);
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectWithSocket);

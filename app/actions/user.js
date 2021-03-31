@@ -2,7 +2,7 @@ import axios from '../utils/api';
 import url from '../config/api';
 import apiConfig from '../config/api';
 import storage from '../utils/storage';
-import { ActionTypes, Strings } from '../constants/';
+import { ActionTypes, Strings, Url } from '../constants/';
 import { getLanguage, showToast } from '../utils/common';
 import Axios from 'axios';
 
@@ -59,17 +59,16 @@ export const setLanguage = payloads => dispatch => {
 
 export const getChat = payloads => dispatch => {
   dispatch({ type: ActionTypes.LOADING, isLoading: true });
-  return Axios.get('http://161.97.122.135:3000/chat', { params: payloads })
+  return Axios.get(Url.server+'/chat', { params: payloads })
     .then(res => {
       dispatch({ type: ActionTypes.LOADING, isLoading: false });
-      console.log('Res: ', res.data)
       return res.data;
     }).catch(e => console.log(e))
 }
 
 export const getChatList = payloads => dispatch => {
   dispatch({ type: ActionTypes.LOADING, isLoading: true });
-  return Axios.get('http://161.97.122.135:3000/chatList', { params: payloads })
+  return Axios.get(Url.server+'/chatList', { params: payloads })
     .then(res => {
       dispatch({ type: ActionTypes.LOADING, isLoading: false });
       return res.data;
@@ -91,14 +90,19 @@ export const getPsychicCategory = payloads => dispatch => {
 export const getPsychicList = payloads => dispatch => {
   dispatch({ type: ActionTypes.LOADING, isLoading: true });
   console.log(payloads)
-  return axios.post(url.psychicList, { payloads: payloads }).then(res => {
+  const specific = axios.post(url.psychicList, { payloads: payloads })
+  const generic = axios.post(url.psychicList)
+  return Axios.all([specific, generic]).then(Axios.spread((...res) => {
     dispatch({ type: ActionTypes.LOADING, isLoading: false });
-    if (res.data.status == 'success') {
-      return res.data;
+    if (res[0].data.status == 'success' && res[1].data.status == 'success') {
+      return {
+        categoryWise: res[0].data,
+        all: res[1].data
+      }
     } else {
       return res;
     }
-  })
+  }))
 }
 
 export const getHoroscope = payloads => dispatch => {

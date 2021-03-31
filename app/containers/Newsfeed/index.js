@@ -44,12 +44,14 @@ class Newsfeed extends React.Component {
         this.setState({
           data: res.data
         })
+        console.log(this.state.data)
       })
-    this.props.socket.emit('notification')
 
-    socket.on('notification', data => {
-      console.log(data)
-      this.props.notificationRef.current?.show();
+    this.props.socket.on('notification', data => {
+      console.log('notification: ', data)
+      if (data.payload.fromUserId != this.props.user.id) {
+        this.props.notificationRef.current?.show()
+      }
     })
   }
 
@@ -76,11 +78,11 @@ class Newsfeed extends React.Component {
             renderItem={({ item, index }) =>
               <Card style={styles.newsfeedbox}>
                 <View>
-                  <TouchableOpacity style={appStyles.listitemtouch} onPress={() => this.NewsDetail()}>
+                  <TouchableOpacity style={appStyles.listitemtouch} onPress={() => this.NewsDetail(item.url)}>
                     <Image source={{ uri: item.image }} style={styles.mainimage} />
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={appStyles.listitemtouch} onPress={() => this.NewsDetail()}>
+                  <TouchableOpacity style={appStyles.listitemtouch} onPress={() => this.NewsDetail(item.url)}>
                     <Text style={styles.newstitle}>{item.title}</Text>
                   </TouchableOpacity>
 
@@ -89,7 +91,7 @@ class Newsfeed extends React.Component {
                 <View>
                   <Button transparent>
                     <Text>{item.date.split(" ")[0]}</Text>
-                    <Text onPress={() => this.NewsDetail(item.url)}>Continue Reading</Text>
+                    <Text onPress={() => this.NewsDetail(item.url)}>Read more </Text>
                   </Button>
                 </View>
               </Card>

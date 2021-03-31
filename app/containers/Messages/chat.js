@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, FlatList, BackHandler } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, FlatList, BackHandler, ActivityIndicator } from 'react-native'
 import _ from 'lodash';
 import { Layout, Colors, Screens, ActionTypes } from '../../constants';
 import { Logo, Statusbar, Headers, Svgicon, LoginBackIcon, FooterIcon, ModalBox, InputBoxWithoutIcon } from '../../components';
@@ -33,10 +33,11 @@ import io from 'socket.io-client';
 import SocketContext from '../Context/socket-context';
 import { showToast } from '../../utils/common';
 import { NavigationActions } from 'react-navigation';
+import moment from 'moment';
 
 class Chat extends React.Component {
 
-  flatlist = React.createRef();
+  flatListRef = React.createRef();
 
   constructor(props) {
     super(props);
@@ -50,17 +51,13 @@ class Chat extends React.Component {
   renderDate = (date) => {
     return (
       <Text style={styles.time}>
-        {new Date(date).getHours().toString() + ':' + new Date(date).getMinutes().toString()}
+        {moment(date).format('HH:mm').toString()}
       </Text>
     );
   }
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.updateCredit)
-    this.props.socket.on('notification', data => {
-      this.props.notificationRef.current?.show()
-    })
-
     this.props.socket.on('message', message => {
       console.log("Message from server : ", message)
       this.setState({
@@ -128,21 +125,26 @@ class Chat extends React.Component {
             <Title style={appStyles.titlewidth}>{this.props.navigation.state.params.name}</Title>
           </Body>
           <Right>
-            <Icon type='Entypo' style={styles.iconSend} name='video-camera' />
+            {/* <Icon type='Entypo' style={styles.iconSend} name='video-camera' /> */}
           </Right>
         </Header>
         <Content enableOnAndroid style={appStyles.content} bounces={false}>
           <View style={styles.container}>
-            <FlatList
-              ref={(ref) => this.flatlist = ref}
-              onLayout={() => this.flatlist.scrollToEnd()}
-              style={styles.list}
+            {this.props.isLoading ? <ActivityIndicator color={Colors.primary} size='large' /> : <FlatList
+              ref={(ref) => this.flatListRef = ref}
+              onContentSizeChange={() => {this.flatListRef.scrollToEnd({animated: false})}}
+              onLayout={() => {this.flatListRef.scrollToEnd({animated: false})}}
+              getItemLayout={(data, index) => (
+                {length: 100, offset: 100*index, index}
+              )}
+              inverted
+              style={[styles.list]}
+              contentContainerStyle={{flexDirection: 'column-reverse'}}
               data={this.state.data}
               keyExtractor={(item) => {
                 return item.id;
               }}
               renderItem={(message) => {
-                console.log(item);
                 const item = message.item;
                 let inMessage = item.messageType === 'in';
                 let itemStyle = inMessage ? styles.itemIn : styles.itemOut;
@@ -155,7 +157,7 @@ class Chat extends React.Component {
                     {inMessage && this.renderDate(item.time)}
                   </View>
                 )
-              }} />
+              }} />}
 
           </View>
         </Content>
@@ -170,17 +172,35 @@ class Chat extends React.Component {
             </View>
 
             <TouchableOpacity style={styles.btnSend} onPress={() => {
-              if (this.state.count >= this.props.navigation.state.params.allowedText) {
-                showToast('You do not have sufficiant credits to send message', 'danger')
-              } else {
+              if (this.state.message != '') {
+                // if (this.state.count >= this.props.navigation.state.params.allowedText) {
+                //   showToast('You do not have sufficiant credits to send message', 'danger')
+                // } else {
+                //   this.sendToPeer('message', {
+                //     message: this.state.message,
+                //     toUserId: this.props.navigation.state.params.toUserId,
+                //     fromUserId: this.props.user.id
+                //   }, this.props.navigation.state.params.socketId)
+                //   this.flatlist.scrollToEnd()
+                //   this.setState({
+                //     data: [...this.state.data, {
+                //       time: Date.now(),
+                //       messageType: 'out',
+                //       message: this.state.message
+                //     }],
+                //     message: '',
+                //     count: this.state.count + 1,
+                //   })
+                // }
                 this.sendToPeer('message', {
                   message: this.state.message,
                   toUserId: this.props.navigation.state.params.toUserId,
                   fromUserId: this.props.user.id
                 }, this.props.navigation.state.params.socketId)
-                this.flatlist.scrollToEnd()
+                // this.flatlist.scrollToEnd()
                 this.setState({
                   data: [...this.state.data, {
+                    id: this.state.data.length + 1,
                     time: Date.now(),
                     messageType: 'out',
                     message: this.state.message
@@ -203,6 +223,7 @@ class Chat extends React.Component {
 const mapStateToProps = (state) => {
   return {
     user: state.auth.user,
+    isLoading: state.common.isLoading,
   };
 };
 
@@ -230,7 +251,7 @@ const mapDispatchToProps = (dispatch) => {
 
 const ConnectWithSocket = props => (
   <SocketContext.Consumer>
-    {value => <Chat {...props} socket={value.socket} notificationRef={value.notificationRef} />}
+    {value => <Chat {...props} socket={value.socket} />}
   </SocketContext.Consumer>
 )
 
