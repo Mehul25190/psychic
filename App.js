@@ -145,7 +145,7 @@ export default class App extends React.Component {
         <Provider store={store}>
           <StyleProvider style={getTheme(material)}>
             <Root>
-              <StatusBar hidden />
+              {/* <StatusBar hidden /> */}
               <Notification text={'New message received'} ref={this.notificationRef} autohide={true} duration={5000} hideStatusBar />
               <ReduxNavigation />
             </Root>

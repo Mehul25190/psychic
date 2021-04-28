@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, FlatList } from 'react-native'
 import _ from 'lodash';
-import { Layout, Colors, Screens, ActionTypes } from '../../constants';
+import { Layout, Colors, Screens, ActionTypes, Strings } from '../../constants';
 import { Logo, Statusbar, Headers, Svgicon, LoginBackIcon, FooterIcon, ModalBox, InputBoxWithoutIcon } from '../../components';
 import imgs from '../../assets/images';
 import {
@@ -98,14 +98,14 @@ class Horoscope extends React.Component {
             <LoginBackIcon props={this.props} />
           </Left>
           <Body style={appStyles.rowXcenter}>
-            <Title style={appStyles.titlewidth}>Daily Horoscope</Title>
+            <Title style={appStyles.titlewidth}>{Strings[this.props.languageId].dailyHoroscope}</Title>
           </Body>
           <Right />
         </Header>
         <Content enableOnAndroid bounces={false}>
 
           <Tabs initialPage={1}>
-            <Tab heading="Yesterday"
+            <Tab heading={Strings[this.props.languageId].yesterday}
               activeTabStyle={{ backgroundColor: '#222222' }}
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
               <Accordion
@@ -118,7 +118,7 @@ class Horoscope extends React.Component {
                 contentStyle={{ padding: 15, color: '#666666', fontSize: 16, lineHeight: 25, }}
               />
             </Tab>
-            <Tab heading="Today"
+            <Tab heading={Strings[this.props.languageId].today}
               activeTabStyle={{ backgroundColor: '#222222' }}
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
               <Accordion
@@ -130,7 +130,7 @@ class Horoscope extends React.Component {
                 contentStyle={{ padding: 15, color: '#666666', fontSize: 16, lineHeight: 25, }}
               />
             </Tab>
-            <Tab heading="Tomorrow"
+            <Tab heading={Strings[this.props.languageId].tomorrow}
               activeTabStyle={{ backgroundColor: '#222222' }}
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
               <Accordion
@@ -157,6 +157,7 @@ class Horoscope extends React.Component {
 const mapStateToProps = (state) => {
   return {
     user: state.auth.user,
+    languageId: state.auth.languageId,
   };
 };
 

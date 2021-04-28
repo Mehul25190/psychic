@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, TouchableOpacity, ImageBackground, ScrollView, FlatList, Image } from 'react-native'
 import _ from 'lodash';
-import { Layout, Colors, Screens, ActionTypes } from '../../constants';
+import { Layout, Colors, Screens, ActionTypes, Strings } from '../../constants';
 import { Logo, Svgicon, Headers, LoginBackIcon, FooterIcon } from '../../components';
 import imgs from '../../assets/images';
 import {
@@ -40,7 +40,6 @@ class Package extends React.Component {
   componentDidMount() {
     this.props.package()
       .then(res => {
-        console.log('Package: ', res.data)
         this.setState({
           text: res.data.text,
           live: res.data.live,
@@ -62,8 +61,7 @@ class Package extends React.Component {
       publishableKey: 'pk_test_51HkBg1LgDtM6OJsOXCS4Cg6iyJspK9pMzZ2Qih4S7AqLlDXPChKpyefWAQfaKpKbyYD13YK7XXsOOugSGffySBRL00o9q4HYGo',
     })
     stripe.paymentRequestWithCardForm({}).then(res => {
-      console.log('Token: ', res)
-      this.props.payment(packageId, amount, res.tokenId, description, this.props.user.id)
+      this.props.payment(packageId, amount, res.tokenId, description, this.props.user.id, this.props.user.name)
         .then(response => {
           console.log('Response: ', response)
           if (response.data.status == 'success') {
@@ -91,12 +89,12 @@ class Package extends React.Component {
             <Row>
               <Col>
                 <Text style={styles.headertitletext}>
-                  <Icon type='Entypo' style={styles.topbaricons} name='message' /> {this.props.user ? this.props.user.text_credits : 0} TXT Credits
+                  <Icon type='Entypo' style={styles.topbaricons} name='message' /> {this.props.user ? this.props.user.text_credits : 0} {Strings[this.props.languageId].textCredits}
                 </Text>
               </Col>
               <Col>
                 <Text style={styles.headertitletext}>
-                  <Icon type='Entypo' style={styles.topbaricons} name='message' /> {this.props.user ? this.props.user.live_credits : 0} LIVE Credits
+                  <Icon type='Entypo' style={styles.topbaricons} name='message' /> {this.props.user ? this.props.user.live_credits : 0} {Strings[this.props.languageId].liveCredits}
                 </Text>
               </Col>
             </Row>
@@ -105,12 +103,12 @@ class Package extends React.Component {
 
 
           <Tabs initialPage={0}>
-            <Tab heading="Text Credit"
+            <Tab heading={Strings[this.props.languageId].textCredits}
               activeTabStyle={{ backgroundColor: '#222222' }}
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
 
               <View>
-                <Text style={styles.pagetitle}>You do not have enough text credits.</Text>
+                <Text style={styles.pagetitle}>{Strings[this.props.languageId].youDoNotHaveEnoughTextCredits}</Text>
               </View>
               <FlatList
                 data={this.state.text}
@@ -133,7 +131,7 @@ class Package extends React.Component {
                         </Body>
                         <Right>
                           <Button rounded onPress={() => this.getToken(item.id, item.amount, item.description)}>
-                            <Text>Buy</Text>
+                            <Text>{Strings[this.props.languageId].buy}</Text>
                           </Button>
                         </Right>
                       </ListItem>
@@ -146,13 +144,13 @@ class Package extends React.Component {
 
 
             </Tab>
-            <Tab heading="Subscription"
+            <Tab heading={Strings[this.props.languageId].subscriptions}
               activeTabStyle={{ backgroundColor: '#222222' }}
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
 
 
               <View>
-                <Text style={styles.pagetitle}>You do not have enough text credits.</Text>
+                <Text style={styles.pagetitle}>{Strings[this.props.languageId].youDoNotHaveEnoughTextCredits}</Text>
               </View>
               <FlatList
                 data={Subscription}
@@ -174,8 +172,8 @@ class Package extends React.Component {
                           <Text>AUD {item.price}</Text>
                         </Body>
                         <Right>
-                          <Button rounded onPress={() => this.getToken(item.id, item.amount, item.desciption)}>
-                            <Text>Buy</Text>
+                          <Button rounded onPress={() => this.getToken(item.id, item.amount, item.questions)}>
+                            <Text>{Strings[this.props.languageId].buy}</Text>
                           </Button>
                         </Right>
                       </ListItem>
@@ -185,11 +183,11 @@ class Package extends React.Component {
                 keyExtractor={item => item.id}
               />
             </Tab>
-            <Tab heading="Live Credit"
+            <Tab heading={Strings[this.props.languageId].liveCredits}
               activeTabStyle={{ backgroundColor: '#222222' }}
               tabStyle={{ backgroundColor: '#FFFFFF' }}>
               <View>
-                <Text style={styles.pagetitle}>You do not have enough Live credits.</Text>
+                <Text style={styles.pagetitle}>{Strings[this.props.languageId].youDoNotHaveEnoughLiveCredits}</Text>
               </View>
               <FlatList
                 data={this.state.live}
@@ -207,12 +205,12 @@ class Package extends React.Component {
                         <Left />
                         <Body>
                           <Text>{item.name}</Text>
-                          <Text note numberOfLines={5}>{item.desciption}</Text>
+                          <Text note numberOfLines={5}>{item.description}</Text>
                           <Text>AUD {item.amount}</Text>
                         </Body>
                         <Right>
-                          <Button rounded onPress={() => this.getToken(item.id, item.amount, item.desciption)}>
-                            <Text>Buy</Text>
+                          <Button rounded onPress={() => this.getToken(item.id, item.amount, item.description)}>
+                            <Text>{Strings[this.props.languageId].buy}</Text>
                           </Button>
                         </Right>
                       </ListItem>
@@ -237,6 +235,7 @@ class Package extends React.Component {
 const mapStateToProps = (state) => {
   return {
     user: state.auth.user,
+    languageId: state.auth.languageId
   };
 };
 
@@ -244,12 +243,13 @@ const mapDispatchToProps = (dispatch) => {
   return {
     package: () => dispatch(userActions.getPackage()),
     logout: () => dispatch(userActions.logoutUser()),
-    payment: (packageId, amount, tokenId, description, userId) => dispatch(userActions.payment({
+    payment: (packageId, amount, tokenId, description, userId, userName) => dispatch(userActions.payment({
       amount: amount,
       tokenId: tokenId,
       description: description,
       package_id: packageId,
-      user_id: userId
+      user_id: userId,
+      name: userName
     })),
     updateUser: (data) => dispatch({
       type: ActionTypes.SIGNIN,

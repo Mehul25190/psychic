@@ -18,6 +18,7 @@ import Draggable from 'react-native-draggable';
 import SocketContext from '../Context/socket-context';
 import { showToast } from '../../utils/common';
 import * as userActions from "../../actions/user";
+import { Icon } from 'native-base';
 
 const dimension = Dimensions.get('window')
 
@@ -224,6 +225,7 @@ class Call extends React.Component {
                                         audio: audioTrack[0].enabled
                                     })
                                 }}>
+                                    {this.state.audio ? <Icon type='Octicons' name='mute'/>  : <Icon type='Octicons' name='unmute'/>}
                                     <Text>{this.state.audio ? 'MUTE' : 'UNMUTE'}</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={{ margin: 10 }} onPress={() => {
@@ -233,8 +235,10 @@ class Call extends React.Component {
                                         video: videoTrack[0].enabled
                                     })
                                 }}>
+                                    {this.state.video ? <Icon type='Feather' name='video-off'/> : <Icon type='Feather' name='video'/>}
                                     <Text>{this.state.video ? 'OFF' : 'ON'}</Text>
                                 </TouchableOpacity>
+                                <Icon name='camera-reverse' type='Ionicons' onPress={() => localStream._tracks[1]._switchCamera()} />
                                 <TouchableOpacity style={{ margin: 10 }} onPress={() => localStream._tracks[1]._switchCamera()} >
                                     <Text>REVERSE</Text>
                                 </TouchableOpacity>

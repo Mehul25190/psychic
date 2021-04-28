@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, FlatList } from 'react-native'
 import _ from 'lodash';
-import { Layout, Colors, Screens, ActionTypes } from '../../constants';
+import { Layout, Colors, Screens, ActionTypes, Strings } from '../../constants';
 import { Logo, Statusbar, Headers, Svgicon, LoginBackIcon, FooterIcon, ModalBox, InputBoxWithoutIcon } from '../../components';
 import imgs from '../../assets/images';
 import {
@@ -42,7 +42,7 @@ class Settings extends React.Component {
 
   logout() {
     this.props.logout();
-    this.props.navigation.navigate(Screens.SignOutStack.route);
+    this.props.navigation.navigate(Screens.SignIn.route);
   }
 
   render() {
@@ -56,7 +56,7 @@ class Settings extends React.Component {
             <LoginBackIcon props={this.props} />
           </Left>
           <Body style={appStyles.rowXcenter}>
-            <Title style={appStyles.titlewidth}>Settings</Title>
+            <Title style={appStyles.titlewidth}>{Strings[this.props.languageId].settings}</Title>
           </Body>
           <Right />
         </Header>
@@ -68,7 +68,7 @@ class Settings extends React.Component {
               </Button>
             </Left>
             <Body>
-              <Text>Personal Information</Text>
+              <Text>{Strings[this.props.languageId].personalInformation}</Text>
             </Body>
             <Right>
               <Icon active name="arrow-forward" />
@@ -81,7 +81,7 @@ class Settings extends React.Component {
               </Button>
             </Left>
             <Body>
-              <Text>Top Up My Balance</Text>
+              <Text>{Strings[this.props.languageId].topUpMyBalance}</Text>
             </Body>
             <Right>
               <Icon active name="arrow-forward" />
@@ -94,7 +94,7 @@ class Settings extends React.Component {
               </Button>
             </Left>
             <Body>
-              <Text>Support</Text>
+              <Text>{Strings[this.props.languageId].support}</Text>
             </Body>
             <Right>
               <Icon active name="arrow-forward" />
@@ -107,7 +107,7 @@ class Settings extends React.Component {
               </Button>
             </Left>
             <Body>
-              <Text>Terms of Services</Text>
+              <Text>{Strings[this.props.languageId].termsOfServices}</Text>
             </Body>
             <Right>
               <Icon active name="arrow-forward" />
@@ -123,7 +123,7 @@ class Settings extends React.Component {
               </Button>
             </Left>
             <Body>
-              <Text>Log Out</Text>
+              <Text>{Strings[this.props.languageId].logout}</Text>
             </Body>
             <Right>
               <Icon active name="arrow-forward" />
@@ -144,6 +144,7 @@ class Settings extends React.Component {
 const mapStateToProps = (state) => {
   return {
     user: state.auth.user,
+    languageId: state.auth.languageId
   };
 };
 

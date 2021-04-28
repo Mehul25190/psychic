@@ -108,7 +108,7 @@ class SignIn extends React.Component {
               </View>
               <View style={styles.loginboxarea}>
                 <View style={appStyles.rowXcenter}>
-                  <Text style={styles.loginwelcome}>Welcome!</Text>
+                  <Text style={styles.loginwelcome}>Welcome! </Text>
                 </View>
                 <Animatable.View
                   animation="fadeInUp"
@@ -146,7 +146,7 @@ class SignIn extends React.Component {
                   <Button transparent full
                     onPress={() => this.onRegisterPressHandler()}
                     style={[styles.linkTextBtn, { justifyContent: 'flex-start' }]}>
-                    <Text style={styles.linkText}> Register </Text>
+                    <Text style={styles.linkText}>Register </Text>
                   </Button>
                   {/* <Button transparent full
                     onPress={() => this.onForgotpasswordPressHandler()}

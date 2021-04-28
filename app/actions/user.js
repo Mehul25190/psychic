@@ -2,16 +2,17 @@ import axios from '../utils/api';
 import url from '../config/api';
 import apiConfig from '../config/api';
 import storage from '../utils/storage';
-import { ActionTypes, Strings, Url } from '../constants/';
+import { ActionTypes, Screens, Strings, Url } from '../constants/';
 import { getLanguage, showToast } from '../utils/common';
 import Axios from 'axios';
+import { NavigationActions } from 'react-navigation';
 
 export const signin = payloads => dispatch => {
   console.log("Payloads : ", payloads)
   dispatch({ type: ActionTypes.LOADING, isLoading: true });
   return axios.post(url.signin, { payloads: payloads })
     .then(res => {
-      console.log("res", res);
+      console.log("res", res.data);
       dispatch({ type: ActionTypes.LOADING, isLoading: false });
       if (res.data.status == 'success') {
         return res.data;
@@ -59,7 +60,7 @@ export const setLanguage = payloads => dispatch => {
 
 export const getChat = payloads => dispatch => {
   dispatch({ type: ActionTypes.LOADING, isLoading: true });
-  return Axios.get(Url.server+'/chat', { params: payloads })
+  return Axios.get(Url.server + '/chat', { params: payloads })
     .then(res => {
       dispatch({ type: ActionTypes.LOADING, isLoading: false });
       return res.data;
@@ -68,7 +69,7 @@ export const getChat = payloads => dispatch => {
 
 export const getChatList = payloads => dispatch => {
   dispatch({ type: ActionTypes.LOADING, isLoading: true });
-  return Axios.get(Url.server+'/chatList', { params: payloads })
+  return Axios.get(Url.server + '/chatList', { params: payloads })
     .then(res => {
       dispatch({ type: ActionTypes.LOADING, isLoading: false });
       return res.data;
@@ -143,7 +144,7 @@ export const newsFeed = payloads => dispatch => {
 
 export const payment = payloads => dispatch => {
   dispatch({ type: ActionTypes.LOADING, isLoading: true });
-  return Axios.post('http://161.97.122.135:3000/payment', { payloads })
+  return Axios.post(Url.server + '/payment', { payloads })
     .then(res => {
       if (res.data.status && res.data.status == 'succeeded') {
         return axios.post(url.payment, { payloads: { ...payloads, transaction_id: res.data.balance_transaction } })
@@ -161,12 +162,9 @@ export const creditUsed = payloads => dispatch => {
   return axios.post(url.creditUsed, { payloads: payloads })
     .then(res => {
       dispatch({ type: ActionTypes.LOADING, isLoading: false })
-      console.log('creditUsed: ',res.data)
-      if(res.data.status == 'success') {
-        dispatch({
-          type: ActionTypes.SIGNIN,
-          data: res.data.data
-        })
+      console.log('creditUsed: ', res.data)
+      if (res.data.status == 'success') {
+        return res.data
       }
     })
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, FlatList, Linking } from 'react-native'
 import _ from 'lodash';
-import { Layout, Colors, Screens, ActionTypes } from '../../constants';
+import { Layout, Colors, Screens, ActionTypes, Strings } from '../../constants';
 import { Logo, Statusbar, Headers, Svgicon, LoginBackIcon, FooterIcon, ModalBox, InputBoxWithoutIcon } from '../../components';
 import imgs from '../../assets/images';
 import {
@@ -66,7 +66,7 @@ class Newsfeed extends React.Component {
             <LoginBackIcon props={this.props} />
           </Left>
           <Body style={appStyles.rowXcenter}>
-            <Title style={appStyles.titlewidth}>News Feed</Title>
+            <Title style={appStyles.titlewidth}>{Strings[this.props.languageId].newsFeed}</Title>
           </Body>
           <Right />
         </Header>
@@ -91,7 +91,7 @@ class Newsfeed extends React.Component {
                 <View>
                   <Button transparent>
                     <Text>{item.date.split(" ")[0]}</Text>
-                    <Text onPress={() => this.NewsDetail(item.url)}>Read more </Text>
+                    <Text onPress={() => this.NewsDetail(item.url)}>{Strings[this.props.languageId].readMore}</Text>
                   </Button>
                 </View>
               </Card>
@@ -112,6 +112,7 @@ class Newsfeed extends React.Component {
 const mapStateToProps = (state) => {
   return {
     user: state.auth.user,
+    languageId: state.auth.languageId,
   };
 };
 

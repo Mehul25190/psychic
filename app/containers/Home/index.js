@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, TouchableOpacity, ImageBackground, ScrollView, FlatList, Image, AppState, ActivityIndicator } from 'react-native'
 import _ from 'lodash';
-import { Layout, Colors, Screens, ActionTypes } from '../../constants';
+import { Layout, Colors, Screens, ActionTypes, Strings } from '../../constants';
 import { Logo, Svgicon, Headers, LoginBackIcon, FooterIcon } from '../../components';
 import imgs from '../../assets/images';
 import {
@@ -30,7 +30,6 @@ class Home extends React.Component {
     super(props);
     this.state = {
       showToast: false,
-      users: MypropertiesData,
       category: [],
       psychic: [],
       all: [],
@@ -38,12 +37,11 @@ class Home extends React.Component {
   }
 
   shuffleArray = (array) => {
-    console.log('Shuffle : ', array)
-    let len = 0//array.length;
+    let len = array.length;
     let temp;
-    while (len < 10) {
+    while (len > 0) {
       let index = Math.floor(Math.random() * len);
-      len++;
+      len--;
       temp = array[len];
       array[len] = array[index]
       array[index] = temp
@@ -87,7 +85,6 @@ class Home extends React.Component {
         .then(res => {
           this.props.psychicList(res.data[0].id)
             .then(r => {
-              console.log('Psychic: ', r)
               let temp = this.shuffleArray(r.all.data)
               this.setState({
                 psychic: r.categoryWise.data,
@@ -105,7 +102,6 @@ class Home extends React.Component {
     }
 
     this.props.socket.on('notification', data => {
-      console.log('notification: ', data)
       if (data.payload.fromUserId != this.props.user.id) {
         this.props.notificationRef.current?.show()
       }
@@ -119,16 +115,16 @@ class Home extends React.Component {
     }
 
     if (this.props.user == null) {
-      this.props.navigation.navigate(Screens.SignOutStack.route)
+      this.props.navigation.navigate(Screens.SignIn.route)
     } else {
       this.appState()
       AppState.addEventListener('change', this.appState)
     }
   }
 
-  Messages(socketId, toUserId, name, textRate) {
+  Messages(socketId, toUserId, name, textRate, profileImagePath) {
     const allowedText = this.props.user.text_credits / textRate;
-    this.props.navigation.navigate(Screens.Chat.route, { socketId: socketId, toUserId: toUserId, name: name, allowedText: allowedText, rate: textRate })
+    this.props.navigation.navigate(Screens.Chat.route, { socketId: socketId, toUserId: toUserId, name: name, allowedText: allowedText, rate: textRate, profileImagePath: profileImagePath })
   }
 
   Call(socketId, liveRate) {
@@ -147,22 +143,23 @@ class Home extends React.Component {
         <Headers {...this.props} />
         <Content enableOnAndroid bounces={false}>
           <View style={styles.headertitle}>
-            <Row>
+            {this.props.user && this.props.user.is_psychic == 1 ? null : <Row>
               <Col>
                 <Text style={styles.headertitletext}>
-                  <Icon type='Entypo' style={styles.topbaricons} name='message' /> {this.props.user ? this.props.user.text_credits : 0} TXT Credits
+                  <Icon type='Entypo' style={styles.topbaricons} name='message' /> {this.props.user ? this.props.user.text_credits : 0} {Strings[this.props.languageId].textCredits}
                 </Text>
               </Col>
               <Col>
                 <Text style={styles.headertitletext}>
-                  <Icon type='Entypo' style={styles.topbaricons} name='message' /> {this.props.user ? this.props.user.live_credits : 0} LIVE Credits
+                  <Icon type='Entypo' style={styles.topbaricons} name='message' /> {this.props.user ? this.props.user.live_credits : 0} {Strings[this.props.languageId].liveCredits}
                 </Text>
               </Col>
-            </Row>
+            </Row>}
           </View>
 
           <View>
-            <Text style={styles.pagetitle}>Featured</Text>
+          {/* <Text style={styles.pagetitle}>{this.props.languageId}</Text> */}
+            <Text style={styles.pagetitle}>{Strings[this.props.languageId].featured}</Text>
           </View>
 
           <FlatList
@@ -217,20 +214,20 @@ class Home extends React.Component {
                     <View style={[item.status == 'Online' ? styles.symbolgreen : styles.symbolred]} />
                     <Text style={styles.datetitle}>{item.name}</Text>
                     {/* <Text style={styles.positiontitle}>{item.position}</Text> */}
-                    <Text style={styles.pricetitle}>{item.live_rate} Cr/Min</Text>
-                    <Text style={styles.pricetitle}>{item.text_rate} Cr/Msg</Text>
+                    <Text style={styles.pricetitle}>{item.live_rate} {Strings[this.props.languageId].crPerMin}</Text>
+                    <Text style={styles.pricetitle}>{item.text_rate} {Strings[this.props.languageId].crPerMsg}</Text>
                     <Row>
                       <Col>
-                        {/* <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
-                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
-                        </TouchableOpacity> */}
-                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate)}>
-                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
+                        <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
+                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
                         </TouchableOpacity>
+                        {/* <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
+                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
+                        </TouchableOpacity> */}
                       </Col>
                       <Col>
-                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate)}>
-                          <Text style={styles.iconstitle}>TEXT</Text>
+                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
+                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].text}</Text>
                         </TouchableOpacity>
                       </Col>
 
@@ -241,7 +238,7 @@ class Home extends React.Component {
           />}
 
           <View>
-            <Text style={styles.pagetitle}>Psychics For You</Text>
+            <Text style={styles.pagetitle}>{Strings[this.props.languageId].psychicForYou}</Text>
           </View>
 
           {this.props.isLoading ? <ActivityIndicator color={Colors.primary} size='large' /> : <FlatList
@@ -257,20 +254,20 @@ class Home extends React.Component {
                     <View style={[item.status == 'Online' ? styles.symbolgreen : styles.symbolred]} />
                     <Text style={styles.datetitle}>{item.name}</Text>
                     {/* <Text style={styles.positiontitle}>{item.position}</Text> */}
-                    <Text style={styles.pricetitle}>{item.live_rate} Cr/Min</Text>
-                    <Text style={styles.pricetitle}>{item.text_rate} Cr/Msg</Text>
+                    <Text style={styles.pricetitle}>{item.live_rate} {Strings[this.props.languageId].crPerMin}</Text>
+                    <Text style={styles.pricetitle}>{item.text_rate} {Strings[this.props.languageId].crPerMsg}</Text>
                     <Row>
                       <Col>
-                        {/* <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
-                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
-                        </TouchableOpacity> */}
-                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate)}>
-                          <Text style={styles.iconstitle}>LIVE CHAT</Text>
+                        <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
+                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
                         </TouchableOpacity>
+                        {/* <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
+                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
+                        </TouchableOpacity> */}
                       </Col>
                       <Col>
-                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate)}>
-                          <Text style={styles.iconstitle}>TEXT</Text>
+                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
+                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].text}</Text>
                         </TouchableOpacity>
                       </Col>
 
@@ -293,9 +290,9 @@ class Home extends React.Component {
 }
 const mapStateToProps = (state) => {
   return {
-    onlinestatus: state.common.onlineStatus,
     user: state.auth.user,
     isLoading: state.common.isLoading,
+    languageId: state.auth.languageId || 0,
   };
 };
 
@@ -306,7 +303,6 @@ const mapDispatchToProps = (dispatch) => {
     })),
     psychicCategoryList: () => dispatch(userActions.getPsychicCategory()),
     logout: () => dispatch(userActions.logoutUser()),
-    onlineStatus: (status) => dispatch({ type: ActionTypes.ONLINE_STATUS, onlineStatus: status })
   };
 };
 

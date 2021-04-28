@@ -20,7 +20,7 @@ import { bindActionCreators } from "redux";
 import * as userActions from "../../actions/user";
 import imgs from '../../assets/images';
 import appStyles from '../../theme/appStyles';
-import { Screens, Colors, Layout } from '../../constants';
+import { Screens, Colors, Layout, Strings } from '../../constants';
 import styles from './styles';
 import { getCurrentRoute } from '../../utils/common';
 import { Svgicon } from '../../components';
@@ -80,7 +80,7 @@ class Drawer extends React.Component {
                         />
                       <Text
                       style={appStyles.drawerText}>
-                      {language[(data.route).toLowerCase()]}</Text>
+                      {this.props.languageId}</Text>
                   </ListItem>
                 );
               }}
@@ -90,7 +90,7 @@ class Drawer extends React.Component {
         <Footer style={styles.logoutFooter}>
           <Button iconLeft transparent full style={styles.logoutBtn} onPress={() => this.logout()} >
             <Icon fontSize='12' type='AntDesign' name='logout' style={styles.white} />
-            <Text style={styles.white}>{this.props.language.logout}</Text>
+            <Text style={styles.white}>{this.props.languageId}</Text>
           </Button>
         </Footer>
       </Container>
@@ -102,7 +102,7 @@ const mapStateToProps = (state) => {
   return {
     state: state,
     user: state.auth.user,
-    language: state.auth.language,
+    languageId: state.auth.languageId,
   };
 };
 

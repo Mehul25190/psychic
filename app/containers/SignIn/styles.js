@@ -11,7 +11,8 @@ export default {
   },
   loginwelcome: {
     fontSize:30,
-    fontFamily: 'Font-Regular',
+    alignSelf: 'stretch',
+    textAlign:'center',
     textTransform:'capitalize',
     color:'#666666', marginTop: Layout.indent,
   },
@@ -21,8 +22,8 @@ export default {
   linkText:{
     textTransform:'capitalize',
     color: '#002DB3',
+    alignSelf: 'stretch',
     fontSize:16,
-    fontFamily: 'Font-Regular',
   },
   loginbutton: {
     height: 80, marginTop:Layout.indent, 

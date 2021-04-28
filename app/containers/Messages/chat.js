@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, FlatList, BackHandler, ActivityIndicator } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, Animated, ImageBackground, TextInput, Image, TouchableHighlight, Alert, KeyboardAvoidingView, BackHandler, ActivityIndicator, Platform } from 'react-native'
 import _ from 'lodash';
 import { Layout, Colors, Screens, ActionTypes } from '../../constants';
 import { Logo, Statusbar, Headers, Svgicon, LoginBackIcon, FooterIcon, ModalBox, InputBoxWithoutIcon } from '../../components';
@@ -34,6 +34,9 @@ import SocketContext from '../Context/socket-context';
 import { showToast } from '../../utils/common';
 import { NavigationActions } from 'react-navigation';
 import moment from 'moment';
+import { GiftedChat, Send } from 'react-native-gifted-chat';
+import { Keyboard } from 'react-native';
+import { ScrollView } from 'react-native';
 
 class Chat extends React.Component {
 
@@ -46,35 +49,43 @@ class Chat extends React.Component {
       message: '',
       data: [],
       count: 0,
+      giftedMessage: []
     }
-  }
-  renderDate = (date) => {
-    return (
-      <Text style={styles.time}>
-        {moment(date).format('HH:mm').toString()}
-      </Text>
-    );
   }
 
   componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', this.updateCredit)
+    /* this.backHandler =  */BackHandler.addEventListener('hardwareBackPress', this.updateCredit)
+
     this.props.socket.on('message', message => {
-      console.log("Message from server : ", message)
       this.setState({
-        data: [...this.state.data, {
-          id: this.state.data.length + 1,
-          time: Date.now(),
-          messageType: 'in',
-          message: message.message
-        }]
+        giftedMessage: GiftedChat.append(this.state.giftedMessage, {
+          _id: message.message.id,
+          createdAt: Date.now(),
+          text: message.message.message,
+          user: {
+            _id: message.message.fromUserId
+          }
+        })
       })
     })
 
     this.props.navigation.addListener('didFocus', () => {
       this.props.getChat(this.props.user.id, this.props.navigation.state.params.toUserId)
         .then(res => {
+          let x = [];
+          res.data.forEach(element => {
+            x.push({
+              _id: element._id.toString(),
+              createdAt: element.time,
+              text: element.message,
+              user: {
+                _id: element.messageType == 'in' ? this.props.navigation.state.params.toUserId : this.props.user.id,
+              }
+            })
+          });
           this.setState({
-            data: res.data
+            giftedMessage: x,
+            count: 0
           })
         })
         .then(err => console.log(err))
@@ -97,23 +108,29 @@ class Chat extends React.Component {
   }
 
   updateCredit = () => {
-    console.log('Count: ', this.state.count)
-    if (this.state.count > 0) {
-      this.props.usedCredit(this.props.user.id, this.state.count * this.props.navigation.state.params.rate);
+    if (this.props.user && this.props.user.is_psychic != 1 && this.state.count > 0) {
+      const finalCount = this.state.count
+      this.setState({ count: 0 })
+      this.props.usedCredit(this.props.user.id, finalCount * this.props.navigation.state.params.rate)
+        .then(res => {
+          this.props.updateCredit(res.data)
+        })
     }
+    this.props.goBack();
+    return true
   }
 
   render() {
 
     const { search } = this.state;
     return (
+
       <Container>
         <Header transparent style={appStyles.headerbg}>
           <Left style={appStyles.row}>
             <Button transparent full
               onPress={() => {
-                this.updateCredit();
-                this.props.goBack();
+                this.updateCredit()
               }}
               style={appStyles.loginBackcustom}
             >
@@ -128,93 +145,64 @@ class Chat extends React.Component {
             {/* <Icon type='Entypo' style={styles.iconSend} name='video-camera' /> */}
           </Right>
         </Header>
-        <Content enableOnAndroid style={appStyles.content} bounces={false}>
-          <View style={styles.container}>
-            {this.props.isLoading ? <ActivityIndicator color={Colors.primary} size='large' /> : <FlatList
-              ref={(ref) => this.flatListRef = ref}
-              onContentSizeChange={() => {this.flatListRef.scrollToEnd({animated: false})}}
-              onLayout={() => {this.flatListRef.scrollToEnd({animated: false})}}
-              getItemLayout={(data, index) => (
-                {length: 100, offset: 100*index, index}
+        <KeyboardAvoidingView style={{ flex: 1 }} enabled behavior={Platform.select({ ios: 'padding' })} >
+          {/* <Content enableOnAndroid contentContainerStyle={{ flex: 1, height: '100%' }} bounces={false}> */}
+          {this.props.isLoading ?
+            <ActivityIndicator color={Colors.primary} size='large' /> :
+            <GiftedChat
+              messages={this.state.giftedMessage}
+              alwaysShowSend
+              renderSend={(props) => (
+                <Send {...props} disabled={!props.text}
+                  containerStyle={{
+                    width: 44,
+                    height: 44,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginHorizontal: 2,
+                  }}>
+                  <Icon type='Ionicons' name='send' style={{ color: Colors.primary, width: 32, height: 32 }} />
+                </Send>
               )}
-              inverted
-              style={[styles.list]}
-              contentContainerStyle={{flexDirection: 'column-reverse'}}
-              data={this.state.data}
-              keyExtractor={(item) => {
-                return item.id;
+              renderChatEmpty={() => (
+                <KeyboardAvoidingView enabled behavior='padding' style={{ flex: 1, justifyContent: 'center', alignItems: 'center', transform: [{ scaleY: -1 }] }}>
+                  <Text style={{ color: 'grey', fontWeight: '400', justifyContent: 'flex-end' }}>
+                    No message available
+                </Text>
+                </KeyboardAvoidingView>
+              )}
+              onSend={message => {
+                if (this.props.user.is_psychic != 1 && this.state.count >= this.props.navigation.state.params.allowedText) {
+                  showToast('You do not have sufficiant credits to send message', 'danger')
+                } else {
+                  this.sendToPeer('message', {
+                    id: message[0]._id,
+                    message: message[0].text,
+                    toUserId: this.props.navigation.state.params.toUserId,
+                    fromUserId: this.props.user.id,
+                    user: {
+                      id: this.props.navigation.state.params.toUserId,
+                      name: this.props.navigation.state.params.name,
+                      email: this.props.navigation.state.params.email,
+                      text_rate: this.props.navigation.state.params.rate,
+                      profile_img_path: this.props.navigation.state.params.profileImagePath,
+                      is_psychic: 1
+                    }
+                  }, this.props.navigation.state.params.socketId)
+                  this.setState({
+                    giftedMessage: GiftedChat.append(this.state.giftedMessage, message),
+                    count: this.state.count + 1,
+                    message: ''
+                  })
+                }
               }}
-              renderItem={(message) => {
-                const item = message.item;
-                let inMessage = item.messageType === 'in';
-                let itemStyle = inMessage ? styles.itemIn : styles.itemOut;
-                return (
-                  <View style={[styles.item, itemStyle]}>
-                    {!inMessage && this.renderDate(item.time)}
-                    <View style={[styles.balloon]}>
-                      <Text>{item.message}</Text>
-                    </View>
-                    {inMessage && this.renderDate(item.time)}
-                  </View>
-                )
-              }} />}
-
-          </View>
-        </Content>
-        <Footer>
-          <View style={styles.footer}>
-            <View style={styles.inputContainer}>
-              <TextInput style={styles.inputs}
-                value={this.state.message}
-                placeholder="Write a message..."
-                underlineColorAndroid='transparent'
-                onChangeText={(name_address) => this.setState({ message: name_address })} />
-            </View>
-
-            <TouchableOpacity style={styles.btnSend} onPress={() => {
-              if (this.state.message != '') {
-                // if (this.state.count >= this.props.navigation.state.params.allowedText) {
-                //   showToast('You do not have sufficiant credits to send message', 'danger')
-                // } else {
-                //   this.sendToPeer('message', {
-                //     message: this.state.message,
-                //     toUserId: this.props.navigation.state.params.toUserId,
-                //     fromUserId: this.props.user.id
-                //   }, this.props.navigation.state.params.socketId)
-                //   this.flatlist.scrollToEnd()
-                //   this.setState({
-                //     data: [...this.state.data, {
-                //       time: Date.now(),
-                //       messageType: 'out',
-                //       message: this.state.message
-                //     }],
-                //     message: '',
-                //     count: this.state.count + 1,
-                //   })
-                // }
-                this.sendToPeer('message', {
-                  message: this.state.message,
-                  toUserId: this.props.navigation.state.params.toUserId,
-                  fromUserId: this.props.user.id
-                }, this.props.navigation.state.params.socketId)
-                // this.flatlist.scrollToEnd()
-                this.setState({
-                  data: [...this.state.data, {
-                    id: this.state.data.length + 1,
-                    time: Date.now(),
-                    messageType: 'out',
-                    message: this.state.message
-                  }],
-                  message: '',
-                  count: this.state.count + 1,
-                })
-              }
-            }}>
-              <Icon style={styles.iconSend} name="send" />
-            </TouchableOpacity>
-          </View>
-        </Footer>
-
+              user={{
+                _id: this.props.user.id
+              }}
+            />
+          }
+          {/* </Content> */}
+        </KeyboardAvoidingView>
       </Container>
 
     );
@@ -245,7 +233,11 @@ const mapDispatchToProps = (dispatch) => {
       credits: credits,
       type: 'text'
     })),
-    goBack: () => dispatch(NavigationActions.back())
+    goBack: () => dispatch(NavigationActions.navigate({ routeName: Screens.Messages.route })),
+    updateCredit: (data) => dispatch({
+      type: ActionTypes.SIGNIN,
+      data: data
+    })
   };
 };
 

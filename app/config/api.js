@@ -1,5 +1,5 @@
 export default {
-  apiBaseUrl: 'http://universalwebtech.com/mehul_hosting/psychic/api/v1',
+  apiBaseUrl: 'https://inox.net.au/wixnet/api/v1',
   signin: '/login',
   signup: '/register',
   chat: '',
