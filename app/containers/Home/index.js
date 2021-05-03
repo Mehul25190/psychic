@@ -218,12 +218,12 @@ class Home extends React.Component {
                     <Text style={styles.pricetitle}>{item.text_rate} {Strings[this.props.languageId].crPerMsg}</Text>
                     <Row>
                       <Col>
-                        <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
-                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
-                        </TouchableOpacity>
-                        {/* <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
+                        {/* <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
                           <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
                         </TouchableOpacity> */}
+                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
+                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
+                        </TouchableOpacity>
                       </Col>
                       <Col>
                         <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
@@ -258,12 +258,12 @@ class Home extends React.Component {
                     <Text style={styles.pricetitle}>{item.text_rate} {Strings[this.props.languageId].crPerMsg}</Text>
                     <Row>
                       <Col>
-                        <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
-                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
-                        </TouchableOpacity>
-                        {/* <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
+                        {/* <TouchableOpacity style={styles.livechat} onPress={() => item.status == 'Online' ? this.Call(item.socketId, item.live_rate) : showToast(item.name+' is offline, can not make call', 'danger')}>
                           <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
                         </TouchableOpacity> */}
+                        <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
+                          <Text style={styles.iconstitle}>{Strings[this.props.languageId].liveChat}</Text>
+                        </TouchableOpacity>
                       </Col>
                       <Col>
                         <TouchableOpacity style={styles.livetext} onPress={() => this.Messages(item.socketId, item.id, item.name, item.text_rate, item.profile_img_path)}>
